@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<package uuid="headscan-4bbc37">
+ <names>
+  <name lang="en_US">headscan</name>
+ </names>
+ <descriptionLanguages>
+  <language>en_US</language>
+ </descriptionLanguages>
+ <contents>
+  <behaviorContent path="headscan">
+   <nature></nature>
+   <permissions/>
+  </behaviorContent>
+ </contents>
+</package>

@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<package uuid="workout-a25c08">
+ <names>
+  <name lang="en_US">workout</name>
+ </names>
+ <descriptionLanguages>
+  <language>en_US</language>
+ </descriptionLanguages>
+ <contents>
+  <behaviorContent path="workout">
+   <nature></nature>
+   <permissions/>
+  </behaviorContent>
+  <behaviorContent path="workout/workoutnao">
+   <nature></nature>
+   <permissions/>
+  </behaviorContent>
+ </contents>
+</package>

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ChoregrapheProject xmlns="http://www.aldebaran-robotics.com/schema/choregraphe/project.xsd" xar_version="3">
+    <Box name="root" id="-1" localization="8" tooltip="Root box of Choregraphe&apos;s behavior. Highest level possible." x="0" y="0">
+        <bitmap>media/images/box/root.png</bitmap>
+        <script language="4">
+            <content>
+                <![CDATA[]]>
+</content>
+        </script>
+        <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+        <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+        <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+        <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+        <Timeline enable="0">
+            <BehaviorLayer name="behavior_layer1">
+                <BehaviorKeyframe name="keyframe1" index="1">
+                    <Diagram>
+                        <Box name="Timer" id="5" localization="8" tooltip="Stimulate output repeatedly with the specified interval.&#x0A;Can be stopped anytime. &#x0A;Stimulating the input again restarts the timer.&#x0A;" x="363" y="62">
+                            <bitmap>media/images/box/wait.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.timer = None
+
+    def onUnload(self):
+        self.cancelTimer()
+
+    def cancelTimer(self):
+        if self.timer:
+            self.timer.stop()
+        self.timer = None
+
+    def onTimer(self):
+        self.timerOutput()
+
+    def startTimer(self):
+        import qi
+        self.timer = qi.PeriodicTask()
+        self.timer.setCallback(self.onTimer)
+        self.timer.setUsPeriod(int(self.getParameter("Period (s)") * 1000 * 1000))
+        self.timer.start(True)
+
+    def onInput_onStart(self):
+        self.cancelTimer()
+        self.startTimer()
+
+    def onInput_onStop(self):
+        if self.timer and self.timer.isRunning():
+            self.onStopped()
+        self.onUnload()]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Start the timer using the configured period value." id="2" />
+                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Stop the timer." id="3" />
+                            <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when the box is stopped." id="4" />
+                            <Output name="timerOutput" type="1" type_size="1" nature="2" inner="0" tooltip="Send a bang periodically." id="5" />
+                            <Parameter name="Period (s)" inherits_from_parent="0" content_type="2" value="5" default_value="1" min="0" max="5000" tooltip="Defines the period of the timer box (in seconds).&#x0A;&#x0A;For example, if this parameter is equal to 1s, the timerOutput will be stimulated&#x0A;every second until the onStop input is stimulated." id="6" />
+                        </Box>
+                        <Box name="Blink" id="1" localization="8" tooltip="This box makes the robot blink once." x="553" y="52">
+                            <bitmap>media/images/box/interaction/LED.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[import time
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self, False)
+
+    def onLoad(self):
+        self.leds = ALProxy("ALLeds")
+
+    def onUnload(self):
+        #~ puts code for box cleanup here
+        pass
+
+    def onInput_onStart(self):
+        rDuration = 0.05
+        self.leds.post.fadeRGB( "FaceLed0", 0x000000, rDuration )
+        self.leds.post.fadeRGB( "FaceLed1", 0x000000, rDuration )
+        self.leds.post.fadeRGB( "FaceLed2", 0xffffff, rDuration )
+        self.leds.post.fadeRGB( "FaceLed3", 0x000000, rDuration )
+        self.leds.post.fadeRGB( "FaceLed4", 0x000000, rDuration )
+        self.leds.post.fadeRGB( "FaceLed5", 0x000000, rDuration )
+        self.leds.post.fadeRGB( "FaceLed6", 0xffffff, rDuration )
+        self.leds.fadeRGB( "FaceLed7", 0x000000, rDuration )
+        time.sleep( 0.1 )
+        self.leds.fadeRGB( "FaceLeds", 0xffffff, rDuration )
+        self.onDone()]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Output name="onDone" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="3" />
+                        </Box>
+                        <Box name="Movement Tracker" id="3" localization="-1" tooltip="Turn the head in the direction of the greatest movement detected." x="362" y="235">
+                            <bitmap>media/images/box/tracker/tracker.png</bitmap>
+                            <script language="4">
+                                <content>
+                                    <![CDATA[def clip(val, min, max):
+        res = val
+        if(val < min):
+                res = min
+        elif(val > max):
+                res = max
+        return res
+
+class MyClass(GeneratedClass):
+    def __init__(self):
+        GeneratedClass.__init__(self)
+        pass
+
+    def onLoad(self):
+        self.movementdetection = ALProxy( "ALMovementDetection" )
+        self.isRunning = False
+        self.previousJointAngles = ALMotion.getAngles("Head", True)
+        self.currentJointAngles = ALMotion.getAngles("Head", True)
+
+    def onUnload(self):
+        if (self.isRunning):
+            ALMemory.unsubscribeToMicroEvent("MovementDetection/MovementDetected", self.getName())
+            self.movementdetection.unsubscribe(self.getName())
+            self.isRunning = False
+        pass
+
+    def onInput_onStart(self):
+        if (not self.isRunning):
+            self.movementdetection.resetDetection()
+            self.movementdetection.subscribe(self.getName())
+            ALMemory.subscribeToMicroEvent("MovementDetection/MovementDetected", self.getName(), "tracking", "processEvent")
+            self.isRunning = True
+        pass
+
+    def onInput_onStop(self):
+        if (self.isRunning):
+            self.onStopped()
+        self.onUnload()
+        pass
+
+
+    def processEvent(self, *_args):
+        self.previousJointAngles = self.currentJointAngles
+        self.currentJointAngles = ALMotion.getAngles("Head", True)
+        sensitivity = self.getParameter("Sensitivity")
+
+        movementInfo = ALMemory.getData("MovementDetection/MovementInfo")
+        data = movementInfo[1]
+
+        # To be tracked, a movement must have a ROI bigger than a threshold value that depends on the sensitivity
+        minSize = (2+(1-sensitivity)*38)*3.14/180
+        # if sensitivity == 1, minSize = 2 degrees // if sensitivity == 0, minSize = 40 degrees
+
+       # Here we decide to track the movement that has the biggest ROI
+        max = minSize
+        index = -1
+        for i in range(0, len(data)):
+            if (data[i][1][2] > max):
+                max = data[i][1][2]
+                index = i
+            if (data[i][1][3] > max):
+                max = data[i][1][3]
+                index = i
+
+        if (index > -1):
+            result = data[index][0]
+            yaw = self.currentJointAngles[0] +result[0]
+            pitch = self.currentJointAngles[1] +result[1]
+            yaw = clip( yaw, -1.0, 1.0)
+            pitch = clip( pitch, -0.45, 0.10)
+            ALMotion.setAngles("Head", [yaw, pitch], 0.1)]]>
+</content>
+                            </script>
+                            <Input name="onLoad" type="1" type_size="1" nature="0" inner="1" tooltip="Signal sent when diagram is loaded." id="1" />
+                            <Input name="onStart" type="1" type_size="1" nature="2" inner="0" tooltip="Box behavior starts when a signal is received on this input." id="2" />
+                            <Input name="onStop" type="1" type_size="1" nature="3" inner="0" tooltip="Box behavior stops when a signal is received on this input." id="3" />
+                            <Output name="onStopped" type="1" type_size="1" nature="1" inner="0" tooltip="Signal sent when box behavior is finished." id="4" />
+                            <Parameter name="Sensitivity" inherits_from_parent="0" content_type="2" value="0.8" default_value="0.8" min="0" max="1" tooltip="Sets the sensitivity for movement detection. The higher the sensitivity is set, the smaller movements are detected." id="5" />
+                        </Box>
+                        <Link inputowner="1" indexofinput="2" outputowner="5" indexofoutput="5" />
+                        <Link inputowner="5" indexofinput="2" outputowner="0" indexofoutput="2" />
+                        <Link inputowner="3" indexofinput="2" outputowner="0" indexofoutput="2" />
+                    </Diagram>
+                </BehaviorKeyframe>
+            </BehaviorLayer>
+        </Timeline>
+    </Box>
+</ChoregrapheProject>

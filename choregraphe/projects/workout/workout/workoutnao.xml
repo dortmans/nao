@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest versionCode="1.0.1" naoqiVersion="1.12">
+  <nature>application</nature>
+  <category />
+  <resources />
+  <local language="english">
+    <name>Work Out Nao!</name>
+    <description>Work out with your robot</description>
+    <triggers>
+      <triggerSentences>
+        <sentence>Work Out Nao</sentence>
+        <sentence>Lets work out</sentence>
+      </triggerSentences>
+    </triggers>
+    <loadingsentences>
+      <loadingsentence>Get ready for a great work out</loadingsentence>
+    </loadingsentences>
+  </local>
+  <local language="french">
+    <name>Entraînement Nao!</name>
+    <description>Séance d'entraînement avec votre robot</description>
+    <triggers>
+      <triggerSentences>
+        <sentence>Entraînement Nao</sentence>
+        <sentence>Permet de séance d'entraînement</sentence>
+      </triggerSentences>
+    </triggers>
+    <loadingsentences>
+      <loadingsentence>Préparez-vous pour un excellent entraînement</loadingsentence>
+    </loadingsentences>
+  </local>
+  <local language="spanish">
+    <name>Entrenamiento Nao!</name>
+    <description>Entrenamiento con su robot</description>
+    <triggers>
+      <triggerSentences>
+        <sentence>Entrenamiento Nao</sentence>
+        <sentence>Vamos a hacer ejercicio</sentence>
+      </triggerSentences>
+    </triggers>
+    <loadingsentences>
+      <loadingsentence>Prepárate para un gran entrenamiento</loadingsentence>
+    </loadingsentences>
+  </local>
+</manifest>
